@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: ls client
+- script: ls client/message-log
   displayName: 'Listing files'
 
 - task: Docker@2
