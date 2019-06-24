@@ -29,3 +29,18 @@ steps:
     repository: 'sebug/postgresql-messagelog'
     command: 'push'
     tags: '$(Build.BuildId)'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'SebugDockerHub'
+    repository: 'sebug/messagelog-client'
+    command: 'build'
+    Dockerfile: 'client/message-log/message-log/Dockerfile'
+    tags: '$(Build.BuildId)'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'SebugDockerHub'
+    repository: 'sebug/messagelog-client'
+    command: 'push'
+    tags: '$(Build.BuildId)'
