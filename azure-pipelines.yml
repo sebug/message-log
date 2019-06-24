@@ -11,11 +11,13 @@ steps:
   displayName: 'Run a one-line script'
 
 - task: Docker@2
+  displayName: 'Docker Login'
   inputs:
     containerRegistry: 'SebugDockerHub'
     command: 'login'
 
 - task: Docker@2
+  displayName: 'Building postgresql docker image'
   inputs:
     containerRegistry: 'SebugDockerHub'
     repository: 'sebug/postgresql-messagelog'
@@ -24,13 +26,18 @@ steps:
     tags: '$(Build.BuildId)'
 
 - task: Docker@2
+  displayName: 'Pushing postgresql docker image'
   inputs:
     containerRegistry: 'SebugDockerHub'
     repository: 'sebug/postgresql-messagelog'
     command: 'push'
     tags: '$(Build.BuildId)'
 
+- script: ls
+  displayName: 'Listing files'
+
 - task: Docker@2
+  displayName: 'Building messagelog client'
   inputs:
     containerRegistry: 'SebugDockerHub'
     repository: 'sebug/messagelog-client'
@@ -39,6 +46,7 @@ steps:
     tags: '$(Build.BuildId)'
 
 - task: Docker@2
+  displayName: 'Pushing messagelog client'
   inputs:
     containerRegistry: 'SebugDockerHub'
     repository: 'sebug/messagelog-client'
