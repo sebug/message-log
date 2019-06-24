@@ -12,5 +12,13 @@ namespace message_log.Models
         public string Sender { get; set; }
         public string Recipient { get; set; }
         public string MessageText { get; set; }
+
+        public string EditLink
+        {
+            get
+            {
+                return "/Message/" + EventID + "/" + MessageID;
+            }
+        }
     }
 }

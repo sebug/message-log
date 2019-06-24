@@ -31,12 +31,23 @@ namespace message_log.Pages
             this._messageRepository = messageRepository;
         }
 
-        public void OnGet(int eventID)
+        public void OnGet(int eventID, int? messageID = null)
         {
             this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
+            if (messageID.HasValue)
+            {
+                var currentMessage = this.Messages.FirstOrDefault(m => m.MessageID == messageID.Value);
+                if (currentMessage != null)
+                {
+                    this.EnteredOn = currentMessage.EnteredOn.ToString("yyyy-MM-dd HH:mm");
+                    this.Sender = currentMessage.Sender;
+                    this.Recipient = currentMessage.Recipient;
+                    this.MessageText = currentMessage.MessageText;
+                }
+            }
         }
 
-        public void OnPost(int eventID)
+        public IActionResult OnPost(int eventID, int? messageID = null)
         {
             DateTime dt;
             if (!String.IsNullOrEmpty(this.EnteredOn) &&
@@ -51,9 +62,13 @@ namespace message_log.Pages
                     Recipient = this.Recipient,
                     MessageText = this.MessageText
                 };
+                if (messageID.HasValue)
+                {
+                    message.MessageID = messageID.Value;
+                }
                 message = this._messageRepository.Save(message);
             }
-            this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
+            return this.Redirect("/Message/" + eventID);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "{eventID}"
+﻿@page "{eventID}/{messageID?}"
 @model MessageModel
 @{
 }
@@ -11,6 +11,7 @@
         <th scope="col">De</th>
         <th scope="col">À</th>
         <th scope="col">Message</th>
+        <th scope="col">Actions</th>
     </thead>
     <tbody>
         @foreach (var message in this.Model.Messages)
@@ -20,6 +21,7 @@
             <td>@message.Sender</td>
             <td>@message.Recipient</td>
             <td>@message.MessageText</td>
+            <td><a href="@message.EditLink">Changer</a></td>
         </tr>
     }
     </tbody>
@@ -34,22 +36,22 @@
 
         <div class="form-group">
             <label for="EnteredOn">Date d'envoi</label>
-            <input type="datetime-local" class="form-control" id="EnteredOn" name="EnteredOn" />
+            <input type="datetime-local" class="form-control" id="EnteredOn" name="EnteredOn" value="@this.Model.EnteredOn" />
         </div>
 
         <div class="form-group">
             <label for="Sender">De</label>
-            <input type="text" class="form-control" id="Sender" name="Sender" />
+            <input type="text" class="form-control" id="Sender" name="Sender" value="@this.Model.Sender" />
         </div>
 
         <div class="form-group">
             <label for="Recipient">À</label>
-            <input type="text" class="form-control" id="Recipient" name="Recipient" />
+            <input type="text" class="form-control" id="Recipient" name="Recipient" value="@this.Model.Recipient" />
         </div>
 
         <div class="form-group">
             <label for="MessageText">Message</label>
-            <textarea class="form-control" id="MessageText" name="MessageText"></textarea>
+            <textarea class="form-control" id="MessageText" name="MessageText">@this.Model.MessageText</textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Enregistrer</button>

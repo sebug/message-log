@@ -27,6 +27,7 @@ namespace message_log.Repositories
             if (message.MessageID > 0)
             {
                 this._messageContext.Message.Attach(message);
+                this._messageContext.Entry(message).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             }
             else
             {
