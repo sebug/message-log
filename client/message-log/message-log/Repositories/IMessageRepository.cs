@@ -7,5 +7,6 @@ namespace message_log.Repositories
     public interface IMessageRepository
     {
         IEnumerable<Message> GetAllByEventID(int eventID);
+        Message Save(Message message);
     }
 }

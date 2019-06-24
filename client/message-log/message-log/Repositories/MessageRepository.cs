@@ -17,5 +17,23 @@ namespace message_log.Repositories
         {
             return this._messageContext.Message.Where(m => m.EventID == eventID).ToList();
         }
+
+        public Message Save(Message message)
+        {
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+            if (message.MessageID > 0)
+            {
+                this._messageContext.Message.Attach(message);
+            }
+            else
+            {
+                this._messageContext.Message.Add(message);
+            }
+            this._messageContext.SaveChanges();
+            return message;
+        }
     }
 }

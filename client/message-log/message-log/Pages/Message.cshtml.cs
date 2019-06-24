@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using message_log.Models;
@@ -37,6 +38,21 @@ namespace message_log.Pages
 
         public void OnPost(int eventID)
         {
+            DateTime dt;
+            if (!String.IsNullOrEmpty(this.EnteredOn) &&
+                DateTime.TryParseExact(this.EnteredOn, "yyyy-MM-dd HH:mm", new CultureInfo("fr-CH"), DateTimeStyles.AllowWhiteSpaces,
+                out dt))
+            {
+                var message = new Message
+                {
+                    EnteredOn = dt,
+                    EventID = eventID,
+                    Sender = this.Sender,
+                    Recipient = this.Recipient,
+                    MessageText = this.MessageText
+                };
+                message = this._messageRepository.Save(message);
+            }
             this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
         }
     }
