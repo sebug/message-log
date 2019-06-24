@@ -34,4 +34,10 @@ Now that we have enabled our OpenMediaVault to handle Docker, we can start actua
 	docker run --name messages_1 -e POSTGRES_PASSWORD=yourpassword -d messages_postgresql
 	docker run -it --link messages_1:postgres --rm messages_postgresql sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
 
+## ASP.NET Core side
+We configure connection strings etc. using environment variables with the prefix
+
+	MESSAGE_LOG_
+
+
 	
