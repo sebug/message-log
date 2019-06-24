@@ -11,6 +11,18 @@ namespace message_log.Pages
 {
     public class MessageModel : PageModel
     {
+        [BindProperty]
+        public string EnteredOn { get; set; }
+
+        [BindProperty]
+        public string Sender { get; set; }
+
+        [BindProperty]
+        public string Recipient { get; set; }
+
+        [BindProperty]
+        public string MessageText { get; set; }
+
         public List<Message> Messages { get; set; }
         private readonly IMessageRepository _messageRepository;
         public MessageModel(IMessageRepository messageRepository)
@@ -19,6 +31,11 @@ namespace message_log.Pages
         }
 
         public void OnGet(int eventID)
+        {
+            this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
+        }
+
+        public void OnPost(int eventID)
         {
             this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
         }

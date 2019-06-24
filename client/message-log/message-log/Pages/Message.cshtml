@@ -23,3 +23,33 @@
     </tbody>
 </table>
 }
+
+<form method="post">
+    <fieldset>
+        <legend>
+            Nouveau message
+        </legend>
+
+        <div class="form-group">
+            <label for="EnteredOn">Date d'envoi</label>
+            <input type="datetime-local" class="form-control" id="EnteredOn" name="EnteredOn" />
+        </div>
+
+        <div class="form-group">
+            <label for="Sender">De</label>
+            <input type="text" class="form-control" id="Sender" name="Sender" />
+        </div>
+
+        <div class="form-group">
+            <label for="Recipient">À</label>
+            <input type="text" class="form-control" id="Recipient" name="Recipient" />
+        </div>
+
+        <div class="form-group">
+            <label for="MessageText">Message</label>
+            <textarea class="form-control" id="MessageText" name="MessageText"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </fieldset>
+</form>
