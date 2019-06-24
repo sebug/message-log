@@ -70,5 +70,14 @@ namespace message_log.Pages
             }
             return this.Redirect("/Message/" + eventID);
         }
+
+        public IActionResult OnPostDelete(int eventID, int? messageID)
+        {
+            if (messageID.HasValue)
+            {
+                this._messageRepository.Delete(messageID.Value);
+            }
+            return this.Redirect("/Message/" + eventID);
+        }
     }
 }

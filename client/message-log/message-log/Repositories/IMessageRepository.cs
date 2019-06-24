@@ -8,5 +8,6 @@ namespace message_log.Repositories
     {
         IEnumerable<Message> GetAllByEventID(int eventID);
         Message Save(Message message);
+        void Delete(int messageID);
     }
 }

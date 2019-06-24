@@ -13,6 +13,16 @@ namespace message_log.Repositories
             this._messageContext = messageContext;
         }
 
+        public void Delete(int messageID)
+        {
+            var messageToDelete = this._messageContext.Message.FirstOrDefault(m => m.MessageID == messageID);
+            if (messageToDelete != null)
+            {
+                this._messageContext.Entry(messageToDelete).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            }
+            this._messageContext.SaveChanges();
+        }
+
         public IEnumerable<Message> GetAllByEventID(int eventID)
         {
             return this._messageContext.Message.Where(m => m.EventID == eventID).ToList();
