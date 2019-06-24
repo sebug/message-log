@@ -19,5 +19,24 @@ namespace message_log.Repositories
         {
             return this._eventContext.Event.ToList();
         }
+
+        public Event Save(Event e)
+        {
+            if (e == null)
+            {
+                throw new ArgumentNullException(nameof(e));
+            }
+            if (e.EventID > 0)
+            {
+                this._eventContext.Event.Attach(e);
+                this._eventContext.Entry(e).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            }
+            else
+            {
+                this._eventContext.Event.Add(e);
+            }
+            this._eventContext.SaveChanges();
+            return e;
+        }
     }
 }

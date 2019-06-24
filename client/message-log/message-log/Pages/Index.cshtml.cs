@@ -12,6 +12,9 @@ namespace message_log.Pages
 {
     public class IndexModel : PageModel
     {
+        [BindProperty]
+        public string EventName { get; set; }
+
         public List<Event> Events { get; set; }
 
         private IEventRepository _eventRepository;
@@ -23,6 +26,20 @@ namespace message_log.Pages
         public void OnGet()
         {
             this.Events = this._eventRepository.GetAll().ToList();
+        }
+
+        public IActionResult OnPost()
+        {
+            if (!String.IsNullOrEmpty(this.EventName))
+            {
+                var ev = new Event
+                {
+                    EventName = this.EventName
+                };
+                ev = this._eventRepository.Save(ev);
+                return this.Redirect(ev.MessageLink);
+            }
+            return this.Redirect("/");
         }
     }
 }

@@ -11,3 +11,18 @@
         }
     </ul>
 }
+
+    <form method="post">
+        <fieldset>
+            <legend>
+                Ajouter un évènement
+            </legend>
+
+            <div class="form-group">
+                <label for="EventName">Nom</label>
+                <input type="text" class="form-control" id="EventName" name="EventName" value="@this.Model.EventName" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+        </fieldset>
+    </form>
