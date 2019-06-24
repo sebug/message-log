@@ -27,7 +27,8 @@ namespace message_log
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => false; // no consent needed - the messages are supposed to be
+                // free of personally identifiable information (only positions and general identifiers used)
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
