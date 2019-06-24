@@ -33,15 +33,7 @@ steps:
     command: 'push'
     tags: '$(Build.BuildId)'
 
-- task: Docker@2
-  displayName: 'Building messagelog client'
-  inputs:
-    containerRegistry: 'SebugDockerHub'
-    repository: 'sebug/messagelog-client'
-    command: 'build'
-    workingDirectory: 'client/message-log'
-    Dockerfile: 'client/message-log/message-log/Dockerfile'
-    tags: '$(Build.BuildId)'
+- script: cd client/message-log/message-log && docker build -t sebug/messagelog-client:$(Build.BuildId)
 
 - task: Docker@2
   displayName: 'Pushing messagelog client'
