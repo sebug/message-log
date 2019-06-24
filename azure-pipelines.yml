@@ -1,0 +1,23 @@
+# Build pipeline for the two docker images
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: echo Verifying build
+  displayName: 'Run a one-line script'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'SebugDockerHub'
+    command: 'login'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'SebugDockerHub'
+    repository: 'postgresql-messagelog'
+    command: 'buildAndPush'
+    Dockerfile: 'postgresql/Dockerfile'
