@@ -31,6 +31,9 @@ namespace message_log
                 // free of personally identifiable information (only positions and general identifiers used)
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.Configure<MessageLogOptions>(this.Configuration);
+            services.AddOptions<MessageLogOptions>();
+
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
