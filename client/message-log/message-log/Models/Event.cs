@@ -8,5 +8,13 @@ namespace message_log.Models
         [Key]
         public int EventID { get; set; }
         public string EventName { get; set; }
+
+        public string MessageLink
+        {
+            get
+            {
+                return "/Message/" + this.EventID;
+            }
+        }
     }
 }

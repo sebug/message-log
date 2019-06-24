@@ -1,0 +1,14 @@
+﻿@page "{eventID}"
+@model MessageModel
+@{
+}
+
+@if (this.Model.Messages != null && this.Model.Messages.Any())
+{
+<ul>
+    @foreach (var message in this.Model.Messages)
+    {
+        <li>@message.EnteredOn</li>
+    }
+</ul>
+}

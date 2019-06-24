@@ -40,8 +40,13 @@ namespace message_log
             {
                 options.UseNpgsql(Configuration["ConnectionString"]);
             });
+            services.AddDbContext<MessageContext>(options =>
+            {
+                options.UseNpgsql(Configuration["ConnectionString"]);
+            });
 
             services.AddTransient<IEventRepository, EventRepository>();
+            services.AddTransient<IMessageRepository, MessageRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
