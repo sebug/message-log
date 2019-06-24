@@ -28,4 +28,4 @@ steps:
     containerRegistry: 'SebugDockerHub'
     repository: 'sebug/postgresql-messagelog'
     command: 'push'
-    tags: 'sebug/postgresql-messagelog:$(Build.BuildId)'
+    tags: '$(Build.BuildId)'
