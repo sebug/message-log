@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  message-log:
+    image: ${DOCKER_REGISTRY-}messagelog
+    build:
+      context: .
+      dockerfile: message-log/Dockerfile

@@ -39,5 +39,14 @@ We configure connection strings etc. using environment variables with the prefix
 
 	MESSAGE_LOG_
 
+Basically the only environment variable that's exposed is ConnectionString. We set this one to allow use inside Docker and it has the format
 
-	
+	export MESSAGE_LOG_ConnectionString="host=localhost;database=postgres;user id=postgres;password=*****;"
+
+for local development.
+
+To build the aspnet side:
+
+	cd client/message-log
+
+
