@@ -39,6 +39,7 @@ steps:
     containerRegistry: 'SebugDockerHub'
     repository: 'sebug/messagelog-client'
     command: 'build'
+    workingDirectory: 'client/message-log'
     Dockerfile: 'client/message-log/message-log/Dockerfile'
     tags: '$(Build.BuildId)'
 
