@@ -26,3 +26,12 @@ https://www.linuxbabe.com/linux-server/install-docker-on-debian-8-jessie-server
 	sudo curl -L https://github.com/docker/compose/releases/download/1.25.0-rc1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 
+## Docker images
+Now that we have enabled our OpenMediaVault to handle Docker, we can start actually coding. First, the Postgresql image:
+
+	cd postgresql
+	docker build -t messages_postgresql .
+	docker run --name messages_1 -e POSTGRES_PASSWORD=yourpassword -d messages_postgresql
+	docker run -it --link messages_1:postgres --rm messages_postgresql sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres'
+
+	
