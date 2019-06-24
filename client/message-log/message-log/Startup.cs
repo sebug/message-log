@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using message_log.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace message_log
 {
@@ -34,7 +36,12 @@ namespace message_log
             services.Configure<MessageLogOptions>(this.Configuration);
             services.AddOptions<MessageLogOptions>();
 
+            services.AddDbContext<EventContext>(options =>
+            {
+                options.UseNpgsql(Configuration["ConnectionString"]);
+            });
 
+            services.AddTransient<IEventRepository, EventRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

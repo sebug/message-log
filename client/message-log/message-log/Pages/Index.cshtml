@@ -4,3 +4,10 @@
     ViewData["Title"] = "Évènements";
 }
 
+@if (this.Model.Events != null && this.Model.Events.Any()) {
+    <ul>
+        @foreach (var ev in this.Model.Events) {
+            <li>@ev.EventName</li>
+        }
+    </ul>
+}
