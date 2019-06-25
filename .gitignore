@@ -410,3 +410,7 @@ secrets.json
 
 # The copied over dockerfile
 client/message-log/Dockerfile
+
+# Environment variables
+messagelogclient.env
+database.env
