@@ -26,10 +26,15 @@ namespace message_log.Pages
 
         public List<Message> Messages { get; set; }
         private readonly IMessageRepository _messageRepository;
-        public MessageModel(IMessageRepository messageRepository)
+        private readonly IEventRepository _eventRepository;
+        public MessageModel(IMessageRepository messageRepository,
+            IEventRepository eventRepository)
         {
             this._messageRepository = messageRepository;
+            this._eventRepository = eventRepository;
         }
+
+        public string EventName { get; set; }
 
         public void OnGet(int eventID, int? messageID = null)
         {
@@ -44,6 +49,12 @@ namespace message_log.Pages
                     this.Recipient = currentMessage.Recipient;
                     this.MessageText = currentMessage.MessageText;
                 }
+            }
+            var ev = this._eventRepository.GetAll().FirstOrDefault(e => e.EventID == eventID);
+            if (ev != null)
+            {
+                this.EventName = ev.EventName;
+                this.ViewData["Title"] = this.EventName;
             }
         }
 

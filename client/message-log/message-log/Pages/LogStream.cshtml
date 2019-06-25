@@ -1,0 +1,32 @@
+﻿@page "{eventID}"
+@model LogStreamModel
+@{
+}
+
+@if (!String.IsNullOrEmpty(this.Model.EventName)) {
+    <h2>@this.Model.EventName</h2>
+}
+
+
+@if (this.Model.Messages != null && this.Model.Messages.Any())
+{
+    <table class="table">
+        <thead>
+        <th scope="col">Date d'envoi</th>
+        <th scope="col">De</th>
+        <th scope="col">À</th>
+        <th scope="col">Message</th>
+        </thead>
+        <tbody>
+            @foreach (var message in this.Model.Messages)
+            {
+                <tr>
+                    <td>@message.EnteredOn.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@message.Sender</td>
+                    <td>@message.Recipient</td>
+                    <td>@message.MessageText</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
