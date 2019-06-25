@@ -38,6 +38,25 @@ Then just
 
 And there you go.
 
+## Reverse proxying the message log
+Now that we have that up and running we want to reverse proxy it with nginx so that we can add an SSL certificate (yes, it would be much nicer to do this end-to-end, but that for later):
+
+	sudo emacs /etc/nginx/sites-available/openmediavault-webgui
+
+And add the server
+
+server {
+  listen 81;
+  location / {
+    proxy_pass http://localhost:9090;
+  }
+}
+
+And then reload:
+
+	sudo nginx -s reload
+
+
 ## Docker images development
 Now that we have enabled our OpenMediaVault to handle Docker, we can start actually coding. First, the Postgresql image:
 
