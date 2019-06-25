@@ -56,6 +56,36 @@ And then reload:
 
 	sudo nginx -s reload
 
+## Enabling SSL
+We are following the guide here to enable SSL: https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins
+
+	cd /etc/nginx/
+	sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/cert.key -out /etc/nginx/cert.crt
+
+
+And then edit openmediavault-webgui again, adding
+
+server {
+  listen 82;
+
+  ssl_certificate	/etc/nginx/cert.crt;
+  ssl_certificate_key	/etc/nginx/cert.key;
+
+  ssl on;
+  ssl_session_cache builtin:1000 shared:SSL:10m;
+  ssl_protocols	TLSv1.2;
+  ssl_prefer_server_ciphers on;
+
+  access_log            /var/log/nginx/messagelog.access.log;
+
+  location / {
+    proxy_pass http://localhost:9090;
+  }
+}
+
+Finally reload
+
+	sudo nginx -s reload
 
 ## Docker images development
 Now that we have enabled our OpenMediaVault to handle Docker, we can start actually coding. First, the Postgresql image:
