@@ -34,7 +34,75 @@
         }
     }
 
+    function autoRefreshStream() {
+        function getPageContent() {
+            return fetch(location.href).then(r => r.text())
+                .then(t => {
+                    var dp = new DOMParser();
+                    return dp.parseFromString(t, 'text/html');
+                });
+        }
+
+        function extractMessages(domNode) {
+            let els = Array.from(domNode.querySelectorAll('main table tbody tr'));
+            return els.map(tr => {
+                let tds = Array.from(tr.querySelectorAll('td'));
+                    return {
+                        EnteredOn: tds[0].innerHTML,
+                        Sender: tds[1].innerHTML,
+                        Recipient: tds[2].innerHTML,
+                        MessageText: tds[3].innerHTML
+                    };
+                });
+        }
+
+        function messagesMatch(oldMessages, newMessages) {
+            if (oldMessages.length !== newMessages.length) {
+                return false;
+            }
+            for (let i = 0; i < oldMessages.length; i += 1) {
+                const oldMessage = oldMessages[i];
+                const newMessage = newMessages[i];
+                if (oldMessage.EnteredOn !== newMessage.EnteredOn ||
+                    oldMessage.Sender !== newMessage.Sender ||
+                    oldMessage.Recipient !== newMessage.Recipient ||
+                    oldMessage.MessageText !== newMessage.MessageText) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function messagesToHTML(messages) {
+            let result = '';
+            for (let message of messages) {
+                let line = '<tr>' +
+                    '<td>' + message.EnteredOn + '</td>' +
+                    '<td>' + message.Sender + '</td>' +
+                    '<td>' + message.Recipient + '</td>' +
+                    '<td>' + message.MessageText + '</td>' +
+                    '</tr>';
+                result += line;
+            }
+
+            return result;
+        }
+
+        function refreshMessages() {
+          getPageContent().then(extractMessages).then(latestMessages => {
+            const currentMessages = extractMessages(document);
+            if (!messagesMatch(currentMessages, latestMessages)) {
+                document.querySelector('main table tbody').innerHTML = messagesToHTML(latestMessages);
+            }
+          });
+        }
+
+        setInterval(refreshMessages, 5 * 1000);
+    }
+
     if (location.href.toLowerCase().indexOf("message") >= 0) {
         customizeMessagePage();
+    } else if (location.href.toLowerCase().indexOf("logstream") >= 0) {
+        autoRefreshStream();
     }
 }());
