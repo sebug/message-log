@@ -1,12 +1,12 @@
 version: '3'
 services:
   messagelogclient:
-    image: "sebug/messagelog-client:314"
+    image: "sebug/messagelog-client:315"
     ports:
      - "9090:80"
     env_file:
      - ./messagelogclient.env
-  database:
-    image: "sebug/postgresql-messagelog:314"
+  logdb:
+    image: "sebug/postgresql-messagelog:315"
     env_file:
      - ./database.env
