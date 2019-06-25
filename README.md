@@ -26,7 +26,19 @@ https://www.linuxbabe.com/linux-server/install-docker-on-debian-8-jessie-server
 	sudo curl -L https://github.com/docker/compose/releases/download/1.25.0-rc1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 
-## Docker images
+
+## Deploying on OpenMediaVault
+Now that all that is installed we can go ahead and deploy it on OpenMediaVault. Create the environment files messagelogclient with MESSAGE_LOG_ConnectionString pointing to host=logdb and a password of your choosing.
+
+In the database.env file just specify that password as POSTGRES_PASSWORD.
+
+Then just
+
+	sudo docker-compose up -d
+
+And there you go.
+
+## Docker images development
 Now that we have enabled our OpenMediaVault to handle Docker, we can start actually coding. First, the Postgresql image:
 
 	cd postgresql
