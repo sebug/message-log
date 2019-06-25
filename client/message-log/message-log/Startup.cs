@@ -65,7 +65,7 @@ namespace message_log
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // Removing the https redirection since there's no chance of a dns entry right now
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
