@@ -16,5 +16,13 @@ namespace message_log.Models
                 return "/Message/" + this.EventID;
             }
         }
+
+        public string LogStreamLink
+        {
+            get
+            {
+                return "/LogStream/" + this.EventID;
+            }
+        }
     }
 }
