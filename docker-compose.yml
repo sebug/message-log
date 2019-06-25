@@ -1,12 +1,18 @@
 version: '3'
 services:
   messagelogclient:
-    image: "sebug/messagelog-client:315"
+    image: "sebug/messagelog-client:316"
     ports:
      - "9090:80"
     env_file:
      - ./messagelogclient.env
   logdb:
-    image: "sebug/postgresql-messagelog:315"
+    image: "sebug/postgresql-messagelog:316"
     env_file:
      - ./database.env
+    volumes:
+     - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
+    driver: local
