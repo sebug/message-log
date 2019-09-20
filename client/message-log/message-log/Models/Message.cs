@@ -12,6 +12,10 @@ namespace message_log.Models
         public string Sender { get; set; }
         public string Recipient { get; set; }
         public string MessageText { get; set; }
+        public int? PriorityID { get; set; }
+        public int? ApprovalID { get; set; }
+        public Priority Priority { get; set; }
+        public Approval Approval { get; set; }
 
         public string EditLink
         {

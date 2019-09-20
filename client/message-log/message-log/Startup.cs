@@ -44,9 +44,19 @@ namespace message_log
             {
                 options.UseNpgsql(Configuration["ConnectionString"]);
             });
+            services.AddDbContext<PriorityContext>(options =>
+            {
+                options.UseNpgsql(Configuration["ConnectionString"]);
+            });
+            services.AddDbContext<ApprovalContext>(options =>
+            {
+                options.UseNpgsql(Configuration["ConnectionString"]);
+            });
 
             services.AddTransient<IEventRepository, EventRepository>();
             services.AddTransient<IMessageRepository, MessageRepository>();
+            services.AddTransient<IPriorityRepository, PriorityRepository>();
+            services.AddTransient<IApprovalRepository, ApprovalRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

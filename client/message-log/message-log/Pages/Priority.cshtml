@@ -1,0 +1,9 @@
+﻿@page
+@model PriorityModel
+@{
+}
+<ul>
+    @foreach (var priority in this.Model.Priorities) {
+        <li>@priority.Name</li>
+    }
+</ul>

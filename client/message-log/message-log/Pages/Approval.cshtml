@@ -1,0 +1,9 @@
+﻿@page
+@model ApprovalModel
+@{
+}
+<ul>
+    @foreach (var approval in this.Model.Approvals) {
+        <li>@approval.Name</li>
+    }
+</ul>
