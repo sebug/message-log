@@ -90,6 +90,21 @@
             return 'approval-not-entered';
         }
 
+        function priorityClass(txt) {
+            if (!txt) {
+                return 'priority-not-entered';
+            }
+            if (txt.indexOf('Ele') >= 0) {
+                return 'priority-elevated';
+            } else if (txt.indexOf('Moy') >= ) {
+                return 'priority-medium';
+            } else if (txt.indexOf('Faible')) {
+                return 'priority-low';
+            } else {
+                return 'priority-none';
+            }
+        }
+
         function messagesToHTML(messages) {
             let result = '';
             for (let message of messages) {
@@ -98,7 +113,7 @@
                     '<td>' + message.Sender + '</td>' +
                     '<td>' + message.Recipient + '</td>' +
                     '<td>' + message.MessageText + '</td>' +
-                    '<td>' + (message.PriorityText || '') + '</td>' +
+                    '<td class="' + priorityClass(message.PriorityText) + '">' + (message.PriorityText || '') + '</td>' +
                     '<td class="' + approvalClass(message.ApprovalText) + '">' + (message.ApprovalText || '') + '</td>' +
                     '</tr>';
                 result += line;

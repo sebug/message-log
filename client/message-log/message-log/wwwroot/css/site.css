@@ -68,3 +68,12 @@ td.approval-partial {
     background-color: orange;
 }
 
+td.priority-elevated {
+    background-color: red;
+}
+td.priority-medium {
+    background-color: orange;
+}
+td.priority-low {
+    background-color: lightgreen;
+}

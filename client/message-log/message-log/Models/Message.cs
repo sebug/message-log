@@ -43,5 +43,32 @@ namespace message_log.Models
                 return "approval-not-entered";
             }
         }
+
+        public string PriorityClass
+        {
+            get
+            {
+                if (this.PriorityID.HasValue)
+                {
+                    if (this.PriorityID.Value == 1)
+                    {
+                        return "priority-elevated";
+                    }
+                    else if (this.PriorityID.Value == 2)
+                    {
+                        return "priority-medium";
+                    }
+                    else if (this.PriorityID.Value == 3)
+                    {
+                        return "priority-low";
+                    }
+                    else if (this.PriorityID.Value == 4)
+                    {
+                        return "priority-none";
+                    }
+                }
+                return "priority-not-entered";
+            }
+        }
     }
 }
