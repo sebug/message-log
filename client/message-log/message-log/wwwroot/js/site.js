@@ -77,6 +77,19 @@
             return true;
         }
 
+        function approvalClass(txt) {
+            if (!txt) {
+                return 'approval-not-entered';
+            }
+            if (txt.indexOf('Partiel') >= 0) {
+                return 'approval-partial';
+            }
+            if (txt.indexOf('Oui') >= 0) {
+                return 'approval-yes';
+            }
+            return 'approval-not-entered';
+        }
+
         function messagesToHTML(messages) {
             let result = '';
             for (let message of messages) {
@@ -86,7 +99,7 @@
                     '<td>' + message.Recipient + '</td>' +
                     '<td>' + message.MessageText + '</td>' +
                     '<td>' + (message.PriorityText || '') + '</td>' +
-                    '<td>' + (message.ApprovalText || '') + '</td>' +
+                    '<td class="' + approvalClass(message.ApprovalText) + '">' + (message.ApprovalText || '') + '</td>' +
                     '</tr>';
                 result += line;
             }

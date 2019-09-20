@@ -24,5 +24,24 @@ namespace message_log.Models
                 return "/Message/" + EventID + "/" + MessageID;
             }
         }
+
+        public string ApprovalClass
+        {
+            get
+            {
+                if (this.ApprovalID.HasValue)
+                {
+                    if (this.ApprovalID.Value == 1)
+                    {
+                        return "approval-yes";
+                    }
+                    else if (this.ApprovalID == 2)
+                    {
+                        return "approval-partial";
+                    }
+                }
+                return "approval-not-entered";
+            }
+        }
     }
 }
