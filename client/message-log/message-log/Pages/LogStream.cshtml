@@ -16,6 +16,8 @@
         <th scope="col">De</th>
         <th scope="col">À</th>
         <th scope="col">Message</th>
+        <th scope="col">Urgence</th>
+        <th scope="col">Quittance</th>
         </thead>
         <tbody>
             @foreach (var message in this.Model.Messages)
@@ -25,6 +27,12 @@
                     <td>@message.Sender</td>
                     <td>@message.Recipient</td>
                     <td>@message.MessageText</td>
+                    <td>@if (message.Priority != null) {
+                        @message.Priority.Name
+                    }</td>
+                    <td>@if (message.Approval != null) {
+                            @message.Approval.Name
+                        }</td>
                 </tr>
             }
         </tbody>

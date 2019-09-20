@@ -16,6 +16,8 @@
         <th scope="col">De</th>
         <th scope="col">À</th>
         <th scope="col">Message</th>
+        <th scope="col">Urgence</th>
+        <th scope="col">Quittance</th>
         <th scope="col">Actions</th>
         </thead>
         <tbody>
@@ -26,6 +28,12 @@
                     <td>@message.Sender</td>
                     <td>@message.Recipient</td>
                     <td>@message.MessageText</td>
+                    <td>@if (message.Priority != null) {
+                        @message.Priority.Name
+                    }</td>
+                    <td>@if (message.Approval != null) {
+                            @message.Approval.Name
+                        }</td>
                     <td>
                         <a href="@message.EditLink">Changer</a>
 
@@ -66,6 +74,20 @@
         <div class="form-group">
             <label for="MessageText">Message</label>
             <textarea class="form-control" id="MessageText" name="MessageText">@this.Model.MessageText</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="Priority">Urgence</label>
+            <select class="form-control" id="Priority" asp-items="this.Model.Priorities" asp-for="PriorityID">
+                <option value="">Séléctionnez une urgence</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Approval">Quittance</label>
+            <select class="form-control" id="Approval" asp-items="this.Model.Approvals" asp-for="ApprovalID">
+                <option value="">Séléctionnez une Quittance</option>
+            </select>
         </div>
 
         <button type="submit" class="btn btn-primary">Enregistrer</button>

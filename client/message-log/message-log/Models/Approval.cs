@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace message_log.Models
@@ -8,5 +9,7 @@ namespace message_log.Models
         [Key]
         public int ApprovalID { get; set; }
         public string Name { get; set; }
+
+        public List<Message> Messages { get; set; }
     }
 }

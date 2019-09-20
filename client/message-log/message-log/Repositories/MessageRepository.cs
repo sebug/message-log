@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using message_log.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace message_log.Repositories
 {
@@ -25,7 +26,10 @@ namespace message_log.Repositories
 
         public IEnumerable<Message> GetAllByEventID(int eventID)
         {
-            return this._messageContext.Message.Where(m => m.EventID == eventID).ToList();
+            return this._messageContext.Message.Where(m => m.EventID == eventID)
+                .Include(m => m.Priority)
+                .Include(m => m.Approval)
+                .ToList();
         }
 
         public Message Save(Message message)

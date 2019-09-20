@@ -12,5 +12,13 @@ namespace message_log.Repositories
         {
 
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Message>().HasOne(m => m.Priority)
+                .WithMany(p => p.Messages);
+            modelBuilder.Entity<Message>().HasOne(m => m.Approval)
+                .WithMany(a => a.Messages);
+        }
     }
 }

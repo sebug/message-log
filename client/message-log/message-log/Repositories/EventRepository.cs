@@ -17,7 +17,8 @@ namespace message_log.Repositories
 
         public IEnumerable<Event> GetAll()
         {
-            return this._eventContext.Event.ToList();
+            return this._eventContext.Event
+                .ToList();
         }
 
         public Event Save(Event e)

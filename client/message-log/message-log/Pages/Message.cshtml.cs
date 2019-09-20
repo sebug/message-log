@@ -7,6 +7,7 @@ using message_log.Models;
 using message_log.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace message_log.Pages
 {
@@ -24,20 +25,48 @@ namespace message_log.Pages
         [BindProperty]
         public string MessageText { get; set; }
 
+        [BindProperty]
+        public int? PriorityID { get; set; }
+
+        [BindProperty]
+        public int? ApprovalID { get; set; }
+
         public List<Message> Messages { get; set; }
+        public List<SelectListItem> Priorities { get; set; }
+        public List<SelectListItem> Approvals { get; set; }
         private readonly IMessageRepository _messageRepository;
         private readonly IEventRepository _eventRepository;
+        private readonly IPriorityRepository _priorityRepository;
+        private readonly IApprovalRepository _approvalRepository;
         public MessageModel(IMessageRepository messageRepository,
-            IEventRepository eventRepository)
+            IEventRepository eventRepository,
+            IPriorityRepository priorityRepository,
+            IApprovalRepository approvalRepository)
         {
             this._messageRepository = messageRepository;
             this._eventRepository = eventRepository;
+            this._priorityRepository = priorityRepository;
+            this._approvalRepository = approvalRepository;
         }
 
         public string EventName { get; set; }
 
         public void OnGet(int eventID, int? messageID = null)
         {
+            this.Approvals = this._approvalRepository.GetAll()
+                .Select(a => new SelectListItem
+                {
+                    Value = a.ApprovalID.ToString(),
+                    Text = a.Name
+                })
+                .ToList();
+            this.Priorities = this._priorityRepository.GetAll()
+                .Select(p => new SelectListItem
+                {
+                    Value = p.PriorityID.ToString(),
+                    Text = p.Name
+                })
+                .ToList();
             this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
             if (messageID.HasValue)
             {
@@ -48,6 +77,8 @@ namespace message_log.Pages
                     this.Sender = currentMessage.Sender;
                     this.Recipient = currentMessage.Recipient;
                     this.MessageText = currentMessage.MessageText;
+                    this.PriorityID = currentMessage.PriorityID;
+                    this.ApprovalID = currentMessage.ApprovalID;
                 }
             }
             var ev = this._eventRepository.GetAll().FirstOrDefault(e => e.EventID == eventID);
@@ -71,7 +102,9 @@ namespace message_log.Pages
                     EventID = eventID,
                     Sender = this.Sender,
                     Recipient = this.Recipient,
-                    MessageText = this.MessageText
+                    MessageText = this.MessageText,
+                    PriorityID = this.PriorityID,
+                    ApprovalID = this.ApprovalID
                 };
                 if (messageID.HasValue)
                 {

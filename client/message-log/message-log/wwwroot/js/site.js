@@ -51,7 +51,9 @@
                         EnteredOn: tds[0].innerHTML,
                         Sender: tds[1].innerHTML,
                         Recipient: tds[2].innerHTML,
-                        MessageText: tds[3].innerHTML
+                        MessageText: tds[3].innerHTML,
+                        PriorityText: tds[4].innerHTML,
+                        ApprovalText: tds[5].innerHTML
                     };
                 });
         }
@@ -66,7 +68,9 @@
                 if (oldMessage.EnteredOn !== newMessage.EnteredOn ||
                     oldMessage.Sender !== newMessage.Sender ||
                     oldMessage.Recipient !== newMessage.Recipient ||
-                    oldMessage.MessageText !== newMessage.MessageText) {
+                    oldMessage.MessageText !== newMessage.MessageText ||
+                    oldMessage.PriorityText !== newMessage.PriorityText ||
+                    oldMessage.ApprovalText !== newMessage.ApprovalText) {
                     return false;
                 }
             }
@@ -81,6 +85,8 @@
                     '<td>' + message.Sender + '</td>' +
                     '<td>' + message.Recipient + '</td>' +
                     '<td>' + message.MessageText + '</td>' +
+                    '<td>' + (message.PriorityText || '') + '</td>' +
+                    '<td>' + (message.ApprovalText || '') + '</td>' +
                     '</tr>';
                 result += line;
             }
