@@ -96,7 +96,7 @@
             }
             if (txt.indexOf('Ele') >= 0) {
                 return 'priority-elevated';
-            } else if (txt.indexOf('Moy') >= ) {
+            } else if (txt.indexOf('Moy') >= 0) {
                 return 'priority-medium';
             } else if (txt.indexOf('Faible')) {
                 return 'priority-low';
