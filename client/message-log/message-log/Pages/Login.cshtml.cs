@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -29,12 +31,19 @@ namespace message_log.Pages
 
         }
 
-        public IActionResult OnPost()
+        public IActionResult OnPost(int? eventID = null)
         {
             bool isAuthenticated = this._authenticationService.IsAuthenticated(this.Username, this.Password);
             if (isAuthenticated)
             {
                 this.AuthenticationFailed = false;
+                this.Response.Cookies.Append("username", this.Username);
+                this.Response.Cookies.Append("password", Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Password)));
+                if (eventID.HasValue)
+                {
+                    return this.Redirect("/Message/" + eventID);
+                }
+                this.Redirect("/");
             }
             else
             {

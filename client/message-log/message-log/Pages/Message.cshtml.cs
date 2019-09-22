@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using message_log.Models;
 using message_log.Repositories;
@@ -38,21 +39,44 @@ namespace message_log.Pages
         private readonly IEventRepository _eventRepository;
         private readonly IPriorityRepository _priorityRepository;
         private readonly IApprovalRepository _approvalRepository;
+        private readonly IAuthenticationService _authenticationService;
         public MessageModel(IMessageRepository messageRepository,
             IEventRepository eventRepository,
             IPriorityRepository priorityRepository,
-            IApprovalRepository approvalRepository)
+            IApprovalRepository approvalRepository,
+            IAuthenticationService authenticationService)
         {
             this._messageRepository = messageRepository;
             this._eventRepository = eventRepository;
             this._priorityRepository = priorityRepository;
             this._approvalRepository = approvalRepository;
+            this._authenticationService = authenticationService;
         }
 
         public string EventName { get; set; }
 
-        public void OnGet(int eventID, int? messageID = null)
+        private bool CheckAuthentication()
         {
+            string username = this.Request.Cookies["username"];
+            string password = this.Request.Cookies["password"];
+
+            if (String.IsNullOrEmpty(username) || String.IsNullOrEmpty(password))
+            {
+                return false;
+            }
+            var passwordBytes = Convert.FromBase64String(password);
+            password = Encoding.UTF8.GetString(passwordBytes);
+
+            return this._authenticationService.IsAuthenticated(username, password);
+        }
+
+        public IActionResult OnGet(int eventID, int? messageID = null)
+        {
+            if (!this.CheckAuthentication())
+            {
+                return this.Redirect("/Login?eventID=" + eventID);
+            }
+
             this.Approvals = this._approvalRepository.GetAll()
                 .Select(a => new SelectListItem
                 {
@@ -87,10 +111,15 @@ namespace message_log.Pages
                 this.EventName = ev.EventName;
                 this.ViewData["Title"] = this.EventName;
             }
+            return null;
         }
 
         public IActionResult OnPost(int eventID, int? messageID = null)
         {
+            if (!this.CheckAuthentication())
+            {
+                return this.Redirect("/Login?eventID=" + eventID);
+            }
             DateTime dt;
             if (!String.IsNullOrEmpty(this.EnteredOn) &&
                 DateTime.TryParseExact(this.EnteredOn, "yyyy-MM-dd HH:mm", new CultureInfo("fr-CH"), DateTimeStyles.AllowWhiteSpaces,
@@ -117,6 +146,10 @@ namespace message_log.Pages
 
         public IActionResult OnPostDelete(int eventID, int? messageID)
         {
+            if (!this.CheckAuthentication())
+            {
+                return this.Redirect("/Login?eventID=" + eventID);
+            }
             if (messageID.HasValue)
             {
                 this._messageRepository.Delete(messageID.Value);
