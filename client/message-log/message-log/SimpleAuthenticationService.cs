@@ -20,6 +20,16 @@ namespace message_log
             {
                 UserName = "sebastian",
                 PasswordHash = "47aXRSLKE8uQ168xk9v2Ranq5Kb1RhBp3CEVFeiqCv4="
+            },
+            new User
+            {
+                UserName = "cedric",
+                PasswordHash = "+NR+9mBWdxy9PZt85AzTuxx7jq/os4Atcf5pm2I8ShE="
+            },
+            new User
+            {
+                UserName = "suivi",
+                PasswordHash = "quch3TEC1UWwIjw6mCJa9D7IEwlpi/cAp9Kd5UcP/jc="
             }
         };
 
