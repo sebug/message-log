@@ -1,0 +1,28 @@
+﻿@page
+@model LoginModel
+@{
+}
+
+@if (this.Model.AuthenticationFailed) {
+    <p><b>Nom d'utilisateur ou mot de passe incorrect</b></p>
+}
+
+<form method="post">
+    <fieldset>
+        <legend>
+            Authentifiez-vous
+        </legend>
+
+        <div class="form-group">
+            <label for="Username">Nom d'utilisateur</label>
+            <input type="text" class="form-control" id="Username" name="Username" value="@this.Model.Username" />
+        </div>
+
+        <div class="form-group">
+            <label for="Password">Mot de passe</label>
+            <input type="password" class="form-control" id="Password" name="Password" value="@this.Model.Password" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Authentifier</button>
+    </fieldset>
+</form>
