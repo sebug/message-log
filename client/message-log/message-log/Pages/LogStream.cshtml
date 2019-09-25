@@ -22,7 +22,7 @@
         <tbody>
             @foreach (var message in this.Model.Messages)
             {
-                <tr>
+                <tr data-id="@message.MessageID">
                     <td>@message.EnteredOn.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>@message.Sender</td>
                     <td>@message.Recipient</td>

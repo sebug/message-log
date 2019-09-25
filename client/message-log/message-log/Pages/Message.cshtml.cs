@@ -91,7 +91,9 @@ namespace message_log.Pages
                     Text = p.Name
                 })
                 .ToList();
-            this.Messages = this._messageRepository.GetAllByEventID(eventID).ToList();
+            this.Messages = this._messageRepository.GetAllByEventID(eventID)
+                .OrderBy(m => m.EnteredOn)
+                .ToList();
             if (messageID.HasValue)
             {
                 var currentMessage = this.Messages.FirstOrDefault(m => m.MessageID == messageID.Value);
