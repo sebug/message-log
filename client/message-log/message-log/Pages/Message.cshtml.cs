@@ -127,6 +127,10 @@ namespace message_log.Pages
                 DateTime.TryParseExact(this.EnteredOn, "yyyy-MM-dd HH:mm", new CultureInfo("fr-CH"), DateTimeStyles.AllowWhiteSpaces,
                 out dt))
             {
+                if (dt > DateTime.UtcNow.AddHours(2)) // very Swiss!
+                {
+                    dt = DateTime.UtcNow.AddHours(2);
+                }
                 var message = new Message
                 {
                     EnteredOn = dt,
