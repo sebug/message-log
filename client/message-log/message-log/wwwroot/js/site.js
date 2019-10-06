@@ -14,7 +14,7 @@
                     if (month.toString().length == 1) {
                         month = '0' + month;
                     }
-                    let day = currentDate.getDate() + 1;
+                    let day = currentDate.getDate();
                     if (day.toString().length == 1) {
                         day = '0' + day;
                     }
