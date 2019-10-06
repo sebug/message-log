@@ -414,3 +414,5 @@ client/message-log/Dockerfile
 # Environment variables
 messagelogclient.env
 database.env
+
+02.initialdata.sql
