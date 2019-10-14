@@ -110,4 +110,16 @@ To build the aspnet side:
 
 	cd client/message-log
 
+## Data Migrations
+Since we pointed to the cutting edge Postgresql we'll have to migrate the data once in a while. You can use the following command to extract the current data:
+
+	docker exec message-log_logdb_1 pg_dump -U postgres --column-inserts --data-only postgres
+
+Then you can run commands as follows:
+
+	docker exec -it message-log_logdb_1 psql -U postgres
+
+Once you have dumped the data, if you have to remove a volume, you can do that as well:
+
+	docker volume rm message-log_db-data
 
