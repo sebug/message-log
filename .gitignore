@@ -416,3 +416,6 @@ messagelogclient.env
 database.env
 
 02.initialdata.sql
+
+ssh_key
+ssh_key.pub
