@@ -51,3 +51,8 @@ steps:
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/drop
       cat docker-compose.yml | sed -E "s/messagelog-client:[[:digit:]]*/messagelog-client:$BUILD_BUILDID/" | sed -E "s/postgresql-messagelog:[[:digit:]]*/postgresql-messagelog:$BUILD_BUILDID/" > $BUILD_ARTIFACTSTAGINGDIRECTORY/drop/docker-compose.yml
  
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
