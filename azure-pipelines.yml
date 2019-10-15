@@ -43,3 +43,12 @@ steps:
     repository: 'sebug/messagelog-client'
     command: 'push'
     tags: '$(Build.BuildId)'
+
+- task: CmdLine@2
+  displayName: 'Writing docker-compose'
+  inputs:
+    script: |
+      echo "version: '3'"
+      echo "services:"
+      echo "  messagelogclient:"
+      echo "    image: \"sebug/messagelog-client:$BUILD_BUILDID\""
