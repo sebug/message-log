@@ -48,14 +48,14 @@ steps:
   displayName: 'Writing docker-compose'
   inputs:
     script: |
-      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/drop
-      cat docker-compose.yml | sed -E "s/messagelog-client:[[:digit:]]*/messagelog-client:$BUILD_BUILDID/" | sed -E "s/postgresql-messagelog:[[:digit:]]*/postgresql-messagelog:$BUILD_BUILDID/" > $BUILD_ARTIFACTSTAGINGDIRECTORY/drop/docker-compose.yml
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/composefile
+      cat docker-compose.yml | sed -E "s/messagelog-client:[[:digit:]]*/messagelog-client:$BUILD_BUILDID/" | sed -E "s/postgresql-messagelog:[[:digit:]]*/postgresql-messagelog:$BUILD_BUILDID/" > $BUILD_ARTIFACTSTAGINGDIRECTORY/composefile/docker-compose.yml
       ls $BUILD_ARTIFACTSTAGINGDIRECTORY
-      ls $BUILD_ARTIFACTSTAGINGDIRECTORY/drop
-      echo "And that should be it..."
+      ls $BUILD_ARTIFACTSTAGINGDIRECTORY/composefile
+      cat $BUILD_ARTIFACTSTAGINGDIRECTORY/composefile/docker-compose.yml
  
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/composefile'
     ArtifactName: 'drop'
     publishLocation: 'Container'
