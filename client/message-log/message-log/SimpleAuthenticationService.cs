@@ -52,12 +52,12 @@ namespace message_log
             var dbUser = this._messagesUserRepository.GetByUserName(username);
             if (dbUser == null)
             {
-                this._logger.Log(LogLevel.Information, "Did not find a user matching " +
+                this._logger.Log(LogLevel.Warning, "Did not find a user matching " +
                     username);
             }
             else
             {
-                this._logger.Log(LogLevel.Information, "Found a user with ID " +
+                this._logger.Log(LogLevel.Warning, "Found a user with ID " +
                     dbUser.MessagesUserID + " and name " + dbUser.UserName);
             }
 
