@@ -36,3 +36,11 @@ CREATE TABLE "Message" (
 
 -- I am being quite liberal with the null entries - this is to allow
 -- partial entry when in a hurry
+
+
+CREATE sequence user_sequence;
+CREATE TABLE "MessagesUser" (
+    "MessagesUserID" INT NOT NULL DEFAULT nextval('user_sequence') PRIMARY KEY,
+    "UserName" VARCHAR(255) NOT NULL,
+    "PasswordHash" VARCHAR(255) NOT NULL
+);
