@@ -16,24 +16,6 @@ namespace message_log
     /// </summary>
     public class SimpleAuthenticationService : IAuthenticationService
     {
-        public static List<User> AuthorizedUsers = new List<User>
-        {
-            new User
-            {
-                UserName = "sebastian",
-                PasswordHash = "47aXRSLKE8uQ168xk9v2Ranq5Kb1RhBp3CEVFeiqCv4="
-            },
-            new User
-            {
-                UserName = "cedric",
-                PasswordHash = "+NR+9mBWdxy9PZt85AzTuxx7jq/os4Atcf5pm2I8ShE="
-            },
-            new User
-            {
-                UserName = "suivi",
-                PasswordHash = "quch3TEC1UWwIjw6mCJa9D7IEwlpi/cAp9Kd5UcP/jc="
-            }
-        };
 
         private readonly IMessagesUserRepository _messagesUserRepository;
         private readonly ILogger _logger;
@@ -46,20 +28,7 @@ namespace message_log
 
         public bool IsAuthenticated(string username, string password)
         {
-            var correspondingUser = AuthorizedUsers.FirstOrDefault(u =>
-            u.UserName == username);
-
-            var dbUser = this._messagesUserRepository.GetByUserName(username);
-            if (dbUser == null)
-            {
-                this._logger.Log(LogLevel.Warning, "Did not find a user matching " +
-                    username);
-            }
-            else
-            {
-                this._logger.Log(LogLevel.Warning, "Found a user with ID " +
-                    dbUser.MessagesUserID + " and name " + dbUser.UserName);
-            }
+            var correspondingUser = this._messagesUserRepository.GetByUserName(username);
 
             if (correspondingUser == null)
             {
