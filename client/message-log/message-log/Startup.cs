@@ -52,11 +52,16 @@ namespace message_log
             {
                 options.UseNpgsql(Configuration["ConnectionString"]);
             });
+            services.AddDbContext<MessagesUserContext>(options =>
+            {
+                options.UseNpgsql(Configuration["ConnectionString"]);
+            });
 
             services.AddTransient<IEventRepository, EventRepository>();
             services.AddTransient<IMessageRepository, MessageRepository>();
             services.AddTransient<IPriorityRepository, PriorityRepository>();
             services.AddTransient<IApprovalRepository, ApprovalRepository>();
+            services.AddTransient<IMessagesUserRepository, MessagesUserRepository>();
             services.AddTransient<IAuthenticationService, SimpleAuthenticationService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

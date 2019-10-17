@@ -4,6 +4,8 @@ using message_log.Models;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
+using message_log.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace message_log
 {
@@ -33,10 +35,32 @@ namespace message_log
             }
         };
 
+        private readonly IMessagesUserRepository _messagesUserRepository;
+        private readonly ILogger _logger;
+        public SimpleAuthenticationService(IMessagesUserRepository messagesUserRepository,
+            ILogger logger)
+        {
+            this._messagesUserRepository = messagesUserRepository;
+            this._logger = logger;
+        }
+
         public bool IsAuthenticated(string username, string password)
         {
             var correspondingUser = AuthorizedUsers.FirstOrDefault(u =>
             u.UserName == username);
+
+            var dbUser = this._messagesUserRepository.GetByUserName(username);
+            if (dbUser == null)
+            {
+                this._logger.Log(LogLevel.Information, "Did not find a user matching " +
+                    username);
+            }
+            else
+            {
+                this._logger.Log(LogLevel.Information, "Found a user with ID " +
+                    dbUser.MessagesUserID + " and name " + dbUser.UserName);
+            }
+
             if (correspondingUser == null)
             {
                 return false;
