@@ -38,7 +38,7 @@ namespace message_log
         private readonly IMessagesUserRepository _messagesUserRepository;
         private readonly ILogger _logger;
         public SimpleAuthenticationService(IMessagesUserRepository messagesUserRepository,
-            ILogger logger)
+            ILogger<SimpleAuthenticationService> logger)
         {
             this._messagesUserRepository = messagesUserRepository;
             this._logger = logger;
