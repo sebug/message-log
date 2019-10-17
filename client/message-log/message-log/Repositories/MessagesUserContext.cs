@@ -8,7 +8,7 @@ namespace message_log.Repositories
     {
         public DbSet<MessagesUser> MessagesUser { get; set; }
 
-        public MessagesUserContext(DbContextOptions<MessageContext> options) : base(options)
+        public MessagesUserContext(DbContextOptions<MessagesUserContext> options) : base(options)
         {
 
         }
