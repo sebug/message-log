@@ -32,6 +32,9 @@
                 }
             });
         }
+
+        const deleteButtons = document.querySelectorAll('.delete-form button');
+        console.log(deleteButtons);
     }
 
     function autoRefreshStream() {
