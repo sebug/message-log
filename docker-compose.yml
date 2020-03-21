@@ -8,6 +8,8 @@ services:
      - ./messagelogclient.env
   logdb:
     image: "sebug/postgresql-messagelog:334"
+    ports:
+     - "5432:5432"
     env_file:
      - ./database.env
     volumes:

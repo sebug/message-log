@@ -3,6 +3,23 @@
 
 // Write your Javascript code.
 (function () {
+    function toggleConfirmedLines(show) {
+        localStorage.setItem("showConfirmedLines", show.toString());
+        const trs = document.querySelectorAll('tr');
+        const confirmedTrs = Array.from(trs)
+            .filter(tr => tr.querySelector('.approval-yes'));
+        console.log('Confirmed trs: ' + confirmedTrs.length);
+        if (show) {
+            confirmedTrs.forEach(tr => {
+                tr.hidden = false;
+            });
+        } else {
+            confirmedTrs.forEach(tr => {
+                tr.hidden = true;
+            });
+        }
+    }
+
     function customizeMessagePage() {
         const enteredOnElement = document.querySelector('#EnteredOn');
         if (enteredOnElement) {
@@ -42,6 +59,16 @@
                     ev.preventDefault();
                 }
             });
+        }
+
+        const showConfirmedLinesCheckbox = document.querySelector('.show-confirmed');
+        if (showConfirmedLinesCheckbox) {
+            let historyShowConfirmedValue = !(localStorage.getItem("showConfirmedLines") === "false");
+            showConfirmedLinesCheckbox.checked = historyShowConfirmedValue;
+            showConfirmedLinesCheckbox.addEventListener('change', (event) => {
+                toggleConfirmedLines(showConfirmedLinesCheckbox.checked);
+            });
+            toggleConfirmedLines(historyShowConfirmedValue);
         }
     }
 
