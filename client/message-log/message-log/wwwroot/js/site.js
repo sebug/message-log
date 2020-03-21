@@ -33,8 +33,14 @@
             });
         }
 
-        const deleteButtons = document.querySelectorAll('.delete-form button');
-        console.log(deleteButtons);
+        const deleteForms = document.querySelectorAll('form.delete-form');
+        for (let i = 0; i < deleteForms.length; i += 1) {
+            let deleteForm = deleteForms[i];
+            deleteForm.addEventListener('submit', function (ev) {
+                let confirmResult = confirm('Voulez-vous vraiment enlever ce message?');
+                return confirmResult;
+            });
+        }
     }
 
     function autoRefreshStream() {
