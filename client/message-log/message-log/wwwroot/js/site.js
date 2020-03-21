@@ -38,7 +38,9 @@
             let deleteForm = deleteForms[i];
             deleteForm.addEventListener('submit', function (ev) {
                 let confirmResult = confirm('Voulez-vous vraiment enlever ce message?');
-                return confirmResult;
+                if (!confirmResult) {
+                    ev.preventDefault();
+                }
             });
         }
     }
