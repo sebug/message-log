@@ -176,18 +176,20 @@
             const currentMessages = extractMessages(document);
               if (!messagesMatch(currentMessages, latestMessages)) {
                   document.querySelector('main table tbody').innerHTML = messagesToHTML(latestMessages);
-                  const trs = document.querySelectorAll('tr');
-                  const confirmedTrs = Array.from(trs)
-                      .filter(tr => tr.querySelector('.approval-yes'));
-                  if (historyShowConfirmedValue) {
-                      confirmedTrs.forEach(tr => {
-                          tr.hidden = false;
-                      });
-                  } else {
-                      confirmedTrs.forEach(tr => {
-                          tr.hidden = true;
-                      });
-                  }
+                  setTimeout(() => {
+                      const trs = document.querySelectorAll('tr');
+                      const confirmedTrs = Array.from(trs)
+                          .filter(tr => tr.querySelector('.approval-yes'));
+                      if (historyShowConfirmedValue) {
+                          confirmedTrs.forEach(tr => {
+                              tr.hidden = false;
+                          });
+                      } else {
+                          confirmedTrs.forEach(tr => {
+                              tr.hidden = true;
+                          });
+                      }
+                  });
             }
           });
         }
