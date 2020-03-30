@@ -166,6 +166,7 @@
             historyShowConfirmedValue = !(localStorage.getItem("showConfirmedLines") === "false");
             showConfirmedLinesCheckbox.checked = historyShowConfirmedValue;
             showConfirmedLinesCheckbox.addEventListener('change', (event) => {
+                historyShowConfirmedValue = showConfirmedLinesCheckbox.checked;
                 toggleConfirmedLines(showConfirmedLinesCheckbox.checked);
             });
             toggleConfirmedLines(historyShowConfirmedValue);
