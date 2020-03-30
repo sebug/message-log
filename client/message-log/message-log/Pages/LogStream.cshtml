@@ -3,9 +3,12 @@
 @{
 }
 
-@if (!String.IsNullOrEmpty(this.Model.EventName)) {
+@if (!String.IsNullOrEmpty(this.Model.EventName))
+{
     <h2>@this.Model.EventName</h2>
 }
+
+<p><label><input type="checkbox" checked="checked" name="showconfirmed" class="show-confirmed" /> Montrer lignes quittancés</label></p>
 
 
 @if (this.Model.Messages != null)
@@ -27,14 +30,20 @@
                     <td>@message.Sender</td>
                     <td>@message.Recipient</td>
                     <td>@message.MessageText</td>
-                    <td class="@message.PriorityClass">@if (message.Priority != null) {
-                        @message.Priority.Name
-                    }</td>
-                    <td class="@message.ApprovalClass">@if (message.Approval != null) {
-                            @message.Approval.Name
-                        }</td>
-                </tr>
-            }
+                    <td class="@message.PriorityClass">
+                        @if (message.Priority != null)
+                        {
+                            @message.Priority.Name
+                        }
+                </td>
+                <td class="@message.ApprovalClass">
+                    @if (message.Approval != null)
+                    {
+                        @message.Approval.Name
+                    }
+            </td>
+        </tr>
+    }
         </tbody>
     </table>
 }

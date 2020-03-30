@@ -160,11 +160,34 @@
             return result;
         }
 
+        let historyShowConfirmedValue = true;
+        const showConfirmedLinesCheckbox = document.querySelector('.show-confirmed');
+        if (showConfirmedLinesCheckbox) {
+            historyShowConfirmedValue = !(localStorage.getItem("showConfirmedLines") === "false");
+            showConfirmedLinesCheckbox.checked = historyShowConfirmedValue;
+            showConfirmedLinesCheckbox.addEventListener('change', (event) => {
+                toggleConfirmedLines(showConfirmedLinesCheckbox.checked);
+            });
+            toggleConfirmedLines(historyShowConfirmedValue);
+        }
+
         function refreshMessages() {
           getPageContent().then(extractMessages).then(latestMessages => {
             const currentMessages = extractMessages(document);
-            if (!messagesMatch(currentMessages, latestMessages)) {
-                document.querySelector('main table tbody').innerHTML = messagesToHTML(latestMessages);
+              if (!messagesMatch(currentMessages, latestMessages)) {
+                  document.querySelector('main table tbody').innerHTML = messagesToHTML(latestMessages);
+                  const trs = document.querySelectorAll('tr');
+                  const confirmedTrs = Array.from(trs)
+                      .filter(tr => tr.querySelector('.approval-yes'));
+                  if (historyShowConfirmedValue) {
+                      confirmedTrs.forEach(tr => {
+                          tr.hidden = false;
+                      });
+                  } else {
+                      confirmedTrs.forEach(tr => {
+                          tr.hidden = true;
+                      });
+                  }
             }
           });
         }
