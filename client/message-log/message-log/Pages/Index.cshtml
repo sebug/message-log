@@ -7,7 +7,8 @@
 @if (this.Model.Events != null && this.Model.Events.Any()) {
     <ul>
         @foreach (var ev in this.Model.Events) {
-            <li><a href="@ev.MessageLink">@ev.EventName</a> (<a href="@ev.LogStreamLink">vue</a>)</li>
+            <li><a href="@ev.MessageLink">@ev.EventName</a> (<a href="@ev.LogStreamLink">vue</a> ,
+        <a href="@ev.ExportLink">télécharger</a>)</li>
         }
     </ul>
 }

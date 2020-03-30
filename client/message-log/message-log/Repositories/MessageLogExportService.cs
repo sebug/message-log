@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using message_log.Models;
 using System.Linq;
+using DocumentFormat.OpenXml;
 
 namespace message_log.Repositories
 {
@@ -29,6 +30,8 @@ namespace message_log.Repositories
             var events = this.EventRepository.GetAll();
             string eventName = events.Where(ev => ev.EventID == eventID)
                 .Select(ev => ev.EventName).FirstOrDefault() ?? "Journal";
+
+            result.FileName = eventName + ".xlsx";
 
             using (var ms = new MemoryStream())
             {
@@ -86,6 +89,83 @@ namespace message_log.Repositories
                     var f1 = InsertCellInWorksheet("F", 1, worksheetPart);
                     f1.CellValue = new CellValue(InsertSharedStringItem("Quittance", sharedStringTable).ToString());
                     f1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+
+                    var messages = this.MessageRepository.GetAllByEventID(eventID);
+
+                    uint rowIdx = 2;
+
+                    Stylesheet styleSheet = new Stylesheet();
+
+                    CellFormat cf = new CellFormat();
+                    cf.NumberFormatId = 22;
+                    cf.ApplyNumberFormat = true;
+
+                    CellFormats cfs = new CellFormats();
+                    cfs.Append(cf);
+                    styleSheet.CellFormats = cfs;
+
+                    styleSheet.Borders = new Borders();
+                    styleSheet.Borders.Append(new Border());
+                    styleSheet.Fills = new Fills();
+                    styleSheet.Fills.Append(new Fill());
+                    styleSheet.Fonts = new Fonts();
+                    styleSheet.Fonts.Append(new Font());
+
+                    workbookPart.AddNewPart<WorkbookStylesPart>();
+                    workbookPart.WorkbookStylesPart.Stylesheet = styleSheet;
+
+                    CellStyles css = new CellStyles();
+                    CellStyle cs = new CellStyle();
+                    cs.FormatId = 0;
+                    cs.BuiltinId = 0;
+                    css.Append(cs);
+                    css.Count = UInt32Value.FromUInt32((uint)css.ChildElements.Count);
+                    styleSheet.Append(css);
+
+                    foreach (var message in messages)
+                    {
+                        var a = InsertCellInWorksheet("A", rowIdx, worksheetPart);
+                        a.CellValue = new CellValue(message.EnteredOn);
+                        a.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.Date);
+                        a.StyleIndex = 0;
+
+                        if (!String.IsNullOrEmpty(message.Sender))
+                        {
+                            var b = InsertCellInWorksheet("B", rowIdx, worksheetPart);
+                            b.CellValue = new CellValue(InsertSharedStringItem(message.Sender, sharedStringTable).ToString());
+                            b.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+                        }
+
+                        if (!String.IsNullOrEmpty(message.Recipient))
+                        {
+                            var c = InsertCellInWorksheet("C", rowIdx, worksheetPart);
+                            c.CellValue = new CellValue(InsertSharedStringItem(message.Recipient, sharedStringTable).ToString());
+                            c.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+                        }
+
+                        if (!String.IsNullOrEmpty(message.MessageText))
+                        {
+                            var d = InsertCellInWorksheet("D", rowIdx, worksheetPart);
+                            d.CellValue = new CellValue(InsertSharedStringItem(message.MessageText, sharedStringTable).ToString());
+                            d.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+                        }
+
+                        if (message.Priority != null && !String.IsNullOrEmpty(message.Priority.Name))
+                        {
+                            var e = InsertCellInWorksheet("E", rowIdx, worksheetPart);
+                            e.CellValue = new CellValue(InsertSharedStringItem(message.Priority.Name, sharedStringTable).ToString());
+                            e.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+                        }
+
+                        if (message.Approval != null && !String.IsNullOrEmpty(message.Approval.Name))
+                        {
+                            var f = InsertCellInWorksheet("F", rowIdx, worksheetPart);
+                            f.CellValue = new CellValue(InsertSharedStringItem(message.Approval.Name, sharedStringTable).ToString());
+                            f.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+                        }
+
+                        rowIdx += 1;
+                    }
 
                     workbookPart.Workbook.Save();
 

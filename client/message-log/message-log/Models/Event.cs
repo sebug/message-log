@@ -24,5 +24,13 @@ namespace message_log.Models
                 return "/LogStream/" + this.EventID;
             }
         }
+
+        public string ExportLink
+        {
+            get
+            {
+                return "/Export?EventID=" + this.EventID;
+            }
+        }
     }
 }
