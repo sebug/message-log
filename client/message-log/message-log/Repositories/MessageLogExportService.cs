@@ -62,7 +62,7 @@ namespace message_log.Repositories
                         Id = spreadsheetDocument.WorkbookPart.
                         GetIdOfPart(worksheetPart),
                         SheetId = 1,
-                        Name = "Journal " + eventName
+                        Name = eventName.Substring(0, 32)
                     };
                     sheets.Append(sheet);
 
