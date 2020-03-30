@@ -146,7 +146,10 @@ namespace message_log.Repositories
                         if (!String.IsNullOrEmpty(message.MessageText))
                         {
                             var d = InsertCellInWorksheet("D", rowIdx, worksheetPart);
-                            d.CellValue = new CellValue(InsertSharedStringItem(message.MessageText, sharedStringTable).ToString());
+                            d.CellValue = new CellValue(InsertSharedStringItem(message.MessageText
+                                .Replace("\n", String.Empty)
+                                .Replace("\r", String.Empty)
+                                , sharedStringTable).ToString());
                             d.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
                         }
 
