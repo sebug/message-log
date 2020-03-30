@@ -26,6 +26,10 @@ namespace message_log.Repositories
                 Content = new byte[0]
             };
 
+            var events = this.EventRepository.GetAll();
+            string eventName = events.Where(ev => ev.EventID == eventID)
+                .Select(ev => ev.EventName).FirstOrDefault() ?? "Journal";
+
             using (var ms = new MemoryStream())
             {
                 using (var spreadsheetDocument = SpreadsheetDocument.Create(ms, DocumentFormat.OpenXml.SpreadsheetDocumentType.Workbook))
@@ -55,13 +59,33 @@ namespace message_log.Repositories
                         Id = spreadsheetDocument.WorkbookPart.
                         GetIdOfPart(worksheetPart),
                         SheetId = 1,
-                        Name = "Journal messages"
+                        Name = "Journal " + eventName
                     };
                     sheets.Append(sheet);
 
                     var a1 = InsertCellInWorksheet("A", 1, worksheetPart);
-                    a1.CellValue = new CellValue(InsertSharedStringItem("De", sharedStringTable).ToString());
+                    a1.CellValue = new CellValue(InsertSharedStringItem("Date d'envoi", sharedStringTable).ToString());
                     a1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+
+                    var b1 = InsertCellInWorksheet("B", 1, worksheetPart);
+                    b1.CellValue = new CellValue(InsertSharedStringItem("De", sharedStringTable).ToString());
+                    b1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+
+                    var c1 = InsertCellInWorksheet("C", 1, worksheetPart);
+                    c1.CellValue = new CellValue(InsertSharedStringItem("A", sharedStringTable).ToString());
+                    c1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+
+                    var d1 = InsertCellInWorksheet("D", 1, worksheetPart);
+                    d1.CellValue = new CellValue(InsertSharedStringItem("Message", sharedStringTable).ToString());
+                    d1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+
+                    var e1 = InsertCellInWorksheet("E", 1, worksheetPart);
+                    e1.CellValue = new CellValue(InsertSharedStringItem("Urgence", sharedStringTable).ToString());
+                    e1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
+
+                    var f1 = InsertCellInWorksheet("F", 1, worksheetPart);
+                    f1.CellValue = new CellValue(InsertSharedStringItem("Quittance", sharedStringTable).ToString());
+                    f1.DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.SharedString);
 
                     workbookPart.Workbook.Save();
 
