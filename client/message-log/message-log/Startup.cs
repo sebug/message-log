@@ -63,6 +63,7 @@ namespace message_log
             services.AddTransient<IApprovalRepository, ApprovalRepository>();
             services.AddTransient<IMessagesUserRepository, MessagesUserRepository>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IMessageLogExportService, MessageLogExportService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
