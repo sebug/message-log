@@ -43,7 +43,10 @@ namespace message_log.Pages
                 return this.Redirect("/Login?eventID=" + eventID);
             }
 
-            return null;
+            var doc = this._messageLogExportService.ExportToExcel(eventID);
+
+            return File(doc.Content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                doc.FileName);
         }
     }
 }
