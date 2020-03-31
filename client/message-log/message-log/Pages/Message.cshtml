@@ -20,7 +20,7 @@
         <th scope="col">Message</th>
         <th scope="col">Urgence</th>
         <th scope="col">Quittance</th>
-        <th scope="col">Actions</th>
+        <th scope="col" class="actions-column">Actions</th>
         </thead>
         <tbody>
             @foreach (var message in this.Model.Messages)
@@ -36,7 +36,7 @@
                     <td class="@message.ApprovalClass">@if (message.Approval != null) {
                             @message.Approval.Name
                         }</td>
-                    <td>
+                    <td class="actions-column">
                         <a href="@message.EditLink">Changer</a>
 
                         <form method="post" class="delete-form" asp-page-handler="delete">

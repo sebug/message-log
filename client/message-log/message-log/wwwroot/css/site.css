@@ -91,4 +91,8 @@ td.priority-low {
     footer {
         display: none;
     }
+
+    th.actions-column, td.actions-column {
+        display: none;
+    }
 }
