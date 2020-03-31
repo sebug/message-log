@@ -78,6 +78,10 @@ td.priority-low {
     background-color: lightgreen;
 }
 
+td.enteredon {
+    white-space: nowrap;
+}
+
 
 @media print {
     form {
