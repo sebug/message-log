@@ -67,31 +67,34 @@
             <label for="Sender">De</label>
             <input type="text" class="form-control" id="Sender" name="Sender" value="@this.Model.Sender" list="proposed-senders" />
         </div>
+        <datalist id="proposed-senders">
+            @if (this.Model.ProposedSenders != null && this.Model.ProposedSenders.Any())
+            {
 
-        @if (this.Model.ProposedSenders != null && this.Model.ProposedSenders.Any())
-        {
-            <datalist id="proposed-senders">
                 @foreach (var sender in this.Model.ProposedSenders)
                 {
                     <option value="@sender" />
                 }
-            </datalist>
-        }
+
+            }
+        </datalist>
 
         <div class="form-group">
             <label for="Recipient">À</label>
             <input type="text" class="form-control" id="Recipient" name="Recipient" value="@this.Model.Recipient" list="proposed-recipients" />
         </div>
 
-        @if (this.Model.ProposedRecipients != null && this.Model.ProposedRecipients.Any())
-        {
-            <datalist id="proposed-recipients">
+        <datalist id="proposed-recipients">
+            @if (this.Model.ProposedRecipients != null && this.Model.ProposedRecipients.Any())
+            {
+
                 @foreach (var recipient in this.Model.ProposedRecipients)
                 {
                     <option value="@recipient" />
                 }
-            </datalist>
-        }
+            }
+
+        </datalist>
 
         <div class="form-group">
             <label for="MessageText">Message</label>
