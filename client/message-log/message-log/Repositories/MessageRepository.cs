@@ -32,6 +32,20 @@ namespace message_log.Repositories
                 .ToList();
         }
 
+        public IEnumerable<string> GetProposedRecipients(int eventID)
+        {
+            var messages = this.GetAllByEventID(eventID);
+            return messages.Select(msg => msg.Recipient).Where(r => !String.IsNullOrEmpty(r))
+                .Distinct();
+        }
+
+        public IEnumerable<string> GetProposedSenders(int eventID)
+        {
+            var messages = this.GetAllByEventID(eventID);
+            return messages.Select(msg => msg.Sender).Where(s => !String.IsNullOrEmpty(s))
+                .Distinct();
+        }
+
         public Message Save(Message message)
         {
             if (message == null)
