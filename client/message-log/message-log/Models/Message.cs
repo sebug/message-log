@@ -17,6 +17,14 @@ namespace message_log.Models
         public Priority Priority { get; set; }
         public Approval Approval { get; set; }
 
+        public string MessageAnchor
+        {
+            get
+            {
+                return "messageline-" + this.MessageID;
+            }
+        }
+
         public string EditLink
         {
             get

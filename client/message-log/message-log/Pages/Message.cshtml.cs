@@ -150,6 +150,7 @@ namespace message_log.Pages
                     message.MessageID = messageID.Value;
                 }
                 message = this._messageRepository.Save(message);
+                return this.Redirect("/Message/" + eventID + "#" + message.MessageAnchor);
             }
             return this.Redirect("/Message/" + eventID);
         }

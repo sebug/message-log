@@ -25,7 +25,7 @@
         <tbody>
             @foreach (var message in this.Model.Messages)
             {
-                <tr>
+                <tr id="@message.MessageAnchor">
                     <td class="enteredon">@message.EnteredOn.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>@message.Sender</td>
                     <td>@message.Recipient</td>
@@ -52,7 +52,7 @@
     </table>
 }
 
-<form method="post">
+<form method="post" id="message-form">
     <fieldset>
         <legend>
             Nouveau message
