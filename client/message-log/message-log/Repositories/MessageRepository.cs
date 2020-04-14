@@ -36,14 +36,16 @@ namespace message_log.Repositories
         {
             var messages = this.GetAllByEventID(eventID);
             return messages.Select(msg => msg.Recipient).Where(r => !String.IsNullOrEmpty(r))
-                .Distinct();
+                .Distinct()
+                .OrderBy(r => r);
         }
 
         public IEnumerable<string> GetProposedSenders(int eventID)
         {
             var messages = this.GetAllByEventID(eventID);
             return messages.Select(msg => msg.Sender).Where(s => !String.IsNullOrEmpty(s))
-                .Distinct();
+                .Distinct()
+                .OrderBy(s => s);
         }
 
         public Message Save(Message message)

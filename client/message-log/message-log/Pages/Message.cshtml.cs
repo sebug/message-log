@@ -32,6 +32,10 @@ namespace message_log.Pages
         [BindProperty]
         public int? ApprovalID { get; set; }
 
+        public List<string> ProposedSenders { get; set; }
+
+        public List<string> ProposedRecipients { get; set; }
+
         public List<Message> Messages { get; set; }
         public List<SelectListItem> Priorities { get; set; }
         public List<SelectListItem> Approvals { get; set; }
@@ -94,6 +98,10 @@ namespace message_log.Pages
             this.Messages = this._messageRepository.GetAllByEventID(eventID)
                 .OrderBy(m => m.EnteredOn)
                 .ToList();
+
+            this.ProposedSenders = this._messageRepository.GetProposedSenders(eventID).ToList();
+            this.ProposedRecipients = this._messageRepository.GetProposedRecipients(eventID).ToList();
+
             if (messageID.HasValue)
             {
                 var currentMessage = this.Messages.FirstOrDefault(m => m.MessageID == messageID.Value);
