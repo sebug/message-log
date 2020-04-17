@@ -29,7 +29,7 @@ namespace message_log.Models
         {
             get
             {
-                return "/Message/" + EventID + "/" + MessageID;
+                return "/Message/" + EventID + "/" + MessageID + "#message-form";
             }
         }
 
