@@ -8,6 +8,7 @@ namespace message_log.Models
         [Key]
         public int EventID { get; set; }
         public string EventName { get; set; }
+        public bool IsArchived { get; set; }
 
         public string MessageLink
         {

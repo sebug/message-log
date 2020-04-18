@@ -18,6 +18,7 @@ namespace message_log.Repositories
         public IEnumerable<Event> GetAll()
         {
             return this._eventContext.Event
+                .Where(ev => !ev.IsArchived)
                 .ToList();
         }
 
