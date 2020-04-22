@@ -14,6 +14,36 @@ namespace message_log.Repositories
             this._messageContext = messageContext;
         }
 
+        public int CopyMessages(int fromEventID, int toEventID)
+        {
+            if (fromEventID == toEventID)
+            {
+                throw new Exception("Can't copy to same event");
+            }
+            var messagesToCopy = this._messageContext.Message.Where(m => m.EventID == fromEventID &&
+            m.ApprovalID != 1).ToList();
+
+            var copiedMessages = messagesToCopy.Select(m =>
+            {
+                var c = m.Copy();
+                c.MessageID = 0;
+                c.EventID = toEventID;
+                return c;
+            }).ToList();
+
+            int i = -1;
+            foreach (var msg in copiedMessages)
+            {
+                msg.MessageID = i;
+                this._messageContext.Add(msg);
+                i -= 1;
+            }
+
+            this._messageContext.SaveChanges();
+
+            return copiedMessages.Count();
+        }
+
         public void Delete(int messageID)
         {
             var messageToDelete = this._messageContext.Message.FirstOrDefault(m => m.MessageID == messageID);

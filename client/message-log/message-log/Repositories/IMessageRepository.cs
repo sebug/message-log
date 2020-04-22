@@ -11,5 +11,6 @@ namespace message_log.Repositories
         IEnumerable<string> GetProposedRecipients(int eventID);
         Message Save(Message message);
         void Delete(int messageID);
+        int CopyMessages(int fromEventID, int toEventID);
     }
 }

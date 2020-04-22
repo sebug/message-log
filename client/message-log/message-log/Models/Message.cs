@@ -17,6 +17,21 @@ namespace message_log.Models
         public Priority Priority { get; set; }
         public Approval Approval { get; set; }
 
+        public Message Copy()
+        {
+            var copy = new Message();
+            copy.MessageID = this.MessageID;
+            copy.EventID = this.EventID;
+            copy.EnteredOn = this.EnteredOn;
+            copy.Sender = this.Sender;
+            copy.Recipient = this.Recipient;
+            copy.MessageText = this.MessageText;
+            copy.PriorityID = this.PriorityID;
+            copy.ApprovalID = this.ApprovalID;
+
+            return copy;
+        }
+
         public string MessageAnchor
         {
             get
