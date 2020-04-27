@@ -31,12 +31,10 @@ namespace message_log.Repositories
                 return c;
             }).ToList();
 
-            int i = -1;
             foreach (var msg in copiedMessages)
             {
-                msg.MessageID = i;
-                this._messageContext.Add(msg);
-                i -= 1;
+                this._messageContext.Message.Add(msg);
+                this._messageContext.SaveChanges();
             }
 
             this._messageContext.SaveChanges();
