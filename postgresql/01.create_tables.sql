@@ -2,7 +2,7 @@ CREATE SEQUENCE event_sequence;
 CREATE TABLE "Event" (
        "EventID" INT NOT NULL DEFAULT nextval('event_sequence') PRIMARY KEY,
        "EventName" VARCHAR(255) NOT NULL,
-       "IsArchived" BOOLEAN NOT NULL CONSTRAINT DEFAULT false
+       "IsArchived" BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE SEQUENCE priority_sequence;
