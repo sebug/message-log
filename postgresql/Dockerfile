@@ -1,183 +1,209 @@
-# vim:set ft=dockerfile:
-FROM debian:buster-slim
+# The Postgresql image with some custom scripts added
 
-# Basically the official Dockerfile from https://github.com/docker-library/postgres/blob/master/12/Dockerfile
-# But creating some initial tables.
+FROM alpine:3.19
 
-RUN set -ex; \
-	if ! command -v gpg > /dev/null; then \
-		apt-get update; \
-		apt-get install -y --no-install-recommends \
-			gnupg \
-			dirmngr \
-		; \
-		rm -rf /var/lib/apt/lists/*; \
-	fi
-
-# explicitly set user/group IDs
+# 70 is the standard uid/gid for "postgres" in Alpine
+# https://git.alpinelinux.org/aports/tree/main/postgresql/postgresql.pre-install?h=3.12-stable
 RUN set -eux; \
-	groupadd -r postgres --gid=999; \
-# https://salsa.debian.org/postgresql/postgresql-common/blob/997d842ee744687d99a2b2d95c1083a2615c79e8/debian/postgresql-common.postinst#L32-35
-	useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres; \
-# also create the postgres user's home directory with appropriate permissions
-# see https://github.com/docker-library/postgres/issues/274
+	addgroup -g 70 -S postgres; \
+	adduser -u 70 -S -D -G postgres -H -h /var/lib/postgresql -s /bin/sh postgres; \
 	mkdir -p /var/lib/postgresql; \
 	chown -R postgres:postgres /var/lib/postgresql
 
-# grab gosu for easy step-down from root
-ENV GOSU_VERSION 1.11
-RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& { command -v gpgconf > /dev/null && gpgconf --kill all || :; } \
-	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true \
-	&& apt-get purge -y --auto-remove ca-certificates wget
+# su-exec (gosu-compatible) is installed further down
 
 # make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
-RUN set -eux; \
-	if [ -f /etc/dpkg/dpkg.cfg.d/docker ]; then \
-# if this file exists, we're likely in "debian:xxx-slim", and locales are thus being excluded so we need to remove that exclusion (since we need locales)
-		grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
-		sed -ri '/\/usr\/share\/locale/d' /etc/dpkg/dpkg.cfg.d/docker; \
-		! grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker; \
-	fi; \
-	apt-get update; apt-get install -y locales; rm -rf /var/lib/apt/lists/*; \
-	localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+# alpine doesn't require explicit locale-file generation
 ENV LANG en_US.utf8
-
-# install "nss_wrapper" in case we need to fake "/etc/passwd" and "/etc/group" (especially for OpenShift)
-# https://github.com/docker-library/postgres/issues/359
-# https://cwrap.org/nss_wrapper.html
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends libnss-wrapper; \
-	rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /docker-entrypoint-initdb.d
 
 # Add the scripts for table creation
 COPY 01.create_tables.sql /docker-entrypoint-initdb.d/
 
+ENV PG_MAJOR 16
+ENV PG_VERSION 16.2
+ENV PG_SHA256 446e88294dbc2c9085ab4b7061a646fa604b4bec03521d5ea671c2e5ad9b2952
 
-RUN set -ex; \
-# pub   4096R/ACCC4CF8 2011-10-13 [expires: 2019-07-02]
-#       Key fingerprint = B97B 0AFC AA1A 47F0 44F2  44A0 7FCC 7D46 ACCC 4CF8
-# uid                  PostgreSQL Debian Repository
-	key='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8'; \
-	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	gpg --batch --export "$key" > /etc/apt/trusted.gpg.d/postgres.gpg; \
-	command -v gpgconf > /dev/null && gpgconf --kill all; \
-	rm -rf "$GNUPGHOME"; \
-	apt-key list
+ENV DOCKER_PG_LLVM_DEPS \
+		llvm15-dev \
+		clang15
 
-ENV PG_MAJOR 12
-ENV PG_VERSION 12.2-2.pgdg100+1
-
-RUN set -ex; \
+RUN set -eux; \
 	\
-# see note below about "*.pyc" files
-	export PYTHONDONTWRITEBYTECODE=1; \
+	wget -O postgresql.tar.bz2 "https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.bz2"; \
+	echo "$PG_SHA256 *postgresql.tar.bz2" | sha256sum -c -; \
+	mkdir -p /usr/src/postgresql; \
+	tar \
+		--extract \
+		--file postgresql.tar.bz2 \
+		--directory /usr/src/postgresql \
+		--strip-components 1 \
+	; \
+	rm postgresql.tar.bz2; \
 	\
-	dpkgArch="$(dpkg --print-architecture)"; \
-	case "$dpkgArch" in \
-		amd64|i386|ppc64el) \
-# arches officialy built by upstream
-			echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list; \
-			apt-get update; \
-			;; \
-		*) \
-# we're on an architecture upstream doesn't officially build for
-# let's build binaries from their published source packages
-			echo "deb-src http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list; \
-			\
-			case "$PG_MAJOR" in \
-				9.* | 10 ) ;; \
-				*) \
-# https://github.com/docker-library/postgres/issues/484 (clang-6.0 required, only available in stretch-backports)
-# TODO remove this once we hit buster+
-					echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list.d/pgdg.list; \
-					;; \
-			esac; \
-			\
-			tempDir="$(mktemp -d)"; \
-			cd "$tempDir"; \
-			\
-			savedAptMark="$(apt-mark showmanual)"; \
-			\
-# build .deb files from upstream's source packages (which are verified by apt-get)
-			apt-get update; \
-			apt-get build-dep -y \
-				postgresql-common pgdg-keyring \
-				"postgresql-$PG_MAJOR=$PG_VERSION" \
-			; \
-			DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
-				apt-get source --compile \
-					postgresql-common pgdg-keyring \
-					"postgresql-$PG_MAJOR=$PG_VERSION" \
-			; \
-# we don't remove APT lists here because they get re-downloaded and removed later
-			\
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-# (which is done after we install the built packages so we don't have to redownload any overlapping dependencies)
-			apt-mark showmanual | xargs apt-mark auto > /dev/null; \
-			apt-mark manual $savedAptMark; \
-			\
-# create a temporary local APT repo to install from (so that dependency resolution can be handled by APT, as it should be)
-			ls -lAFh; \
-			dpkg-scanpackages . > Packages; \
-			grep '^Package: ' Packages; \
-			echo "deb [ trusted=yes ] file://$tempDir ./" > /etc/apt/sources.list.d/temp.list; \
-# work around the following APT issue by using "Acquire::GzipIndexes=false" (overriding "/etc/apt/apt.conf.d/docker-gzip-indexes")
-#   Could not open file /var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages - open (13: Permission denied)
-#   ...
-#   E: Failed to fetch store:/var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages  Could not open file /var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages - open (13: Permission denied)
-			apt-get -o Acquire::GzipIndexes=false update; \
-			;; \
-	esac; \
-	\
-	apt-get install -y postgresql-common; \
-	sed -ri 's/#(create_main_cluster) .*$/\1 = false/' /etc/postgresql-common/createcluster.conf; \
-	apt-get install -y \
-		"postgresql-$PG_MAJOR=$PG_VERSION" \
+	apk add --no-cache --virtual .build-deps \
+		$DOCKER_PG_LLVM_DEPS \
+		bison \
+		coreutils \
+		dpkg-dev dpkg \
+		flex \
+		g++ \
+		gcc \
+		krb5-dev \
+		libc-dev \
+		libedit-dev \
+		libxml2-dev \
+		libxslt-dev \
+		linux-headers \
+		make \
+		openldap-dev \
+		openssl-dev \
+		perl-dev \
+		perl-ipc-run \
+		perl-utils \
+		python3-dev \
+		tcl-dev \
+		util-linux-dev \
+		zlib-dev \
+# https://www.postgresql.org/docs/10/static/release-10.html#id-1.11.6.9.5.13
+		icu-dev \
+# https://www.postgresql.org/docs/14/release-14.html#id-1.11.6.5.5.3.7
+		lz4-dev \
+# https://www.postgresql.org/docs/15/release-15.html "--with-zstd to enable Zstandard builds"
+		zstd-dev \
 	; \
 	\
-	rm -rf /var/lib/apt/lists/*; \
+	cd /usr/src/postgresql; \
+# update "DEFAULT_PGSOCKET_DIR" to "/var/run/postgresql" (matching Debian)
+# see https://anonscm.debian.org/git/pkg-postgresql/postgresql.git/tree/debian/patches/51-default-sockets-in-var.patch?id=8b539fcb3e093a521c095e70bdfa76887217b89f
+	awk '$1 == "#define" && $2 == "DEFAULT_PGSOCKET_DIR" && $3 == "\"/tmp\"" { $3 = "\"/var/run/postgresql\""; print; next } { print }' src/include/pg_config_manual.h > src/include/pg_config_manual.h.new; \
+	grep '/var/run/postgresql' src/include/pg_config_manual.h.new; \
+	mv src/include/pg_config_manual.h.new src/include/pg_config_manual.h; \
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+# explicitly update autoconf config.guess and config.sub so they support more arches/libcs
+	wget -O config/config.guess 'https://git.savannah.gnu.org/cgit/config.git/plain/config.guess?id=7d3d27baf8107b630586c962c057e22149653deb'; \
+	wget -O config/config.sub 'https://git.savannah.gnu.org/cgit/config.git/plain/config.sub?id=7d3d27baf8107b630586c962c057e22149653deb'; \
 	\
-	if [ -n "$tempDir" ]; then \
-# if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
-		apt-get purge -y --auto-remove; \
-		rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
-	fi; \
+# https://git.alpinelinux.org/aports/tree/community/postgresql12/APKBUILD?h=3.18-stable&id=a470294e6d6ca7059e41c54769b7c3c26ec901d4#n158
+	export LLVM_CONFIG="/usr/lib/llvm15/bin/llvm-config"; \
+# https://git.alpinelinux.org/aports/tree/community/postgresql12/APKBUILD?h=3.18-stable&id=a470294e6d6ca7059e41c54769b7c3c26ec901d4#n163
+	export CLANG=clang-15; \
 	\
-# some of the steps above generate a lot of "*.pyc" files (and setting "PYTHONDONTWRITEBYTECODE" beforehand doesn't propagate properly for some reason), so we clean them up manually (as long as they aren't owned by a package)
-	find /usr -name '*.pyc' -type f -exec bash -c 'for pyc; do dpkg -S "$pyc" &> /dev/null || rm -vf "$pyc"; done' -- '{}' +
+# configure options taken from:
+# https://anonscm.debian.org/cgit/pkg-postgresql/postgresql.git/tree/debian/rules?h=9.5
+	./configure \
+		--enable-option-checking=fatal \
+		--build="$gnuArch" \
+# "/usr/src/postgresql/src/backend/access/common/tupconvert.c:105: undefined reference to `libintl_gettext'"
+#		--enable-nls \
+		--enable-integer-datetimes \
+		--enable-thread-safety \
+		--enable-tap-tests \
+# skip debugging info -- we want tiny size instead
+#		--enable-debug \
+		--disable-rpath \
+		--with-uuid=e2fs \
+		--with-pgport=5432 \
+		--with-system-tzdata=/usr/share/zoneinfo \
+		--prefix=/usr/local \
+		--with-includes=/usr/local/include \
+		--with-libraries=/usr/local/lib \
+		--with-gssapi \
+		--with-ldap \
+		--with-tcl \
+		--with-perl \
+		--with-python \
+#		--with-pam \
+		--with-openssl \
+		--with-libxml \
+		--with-libxslt \
+		--with-icu \
+		--with-llvm \
+		--with-lz4 \
+		--with-zstd \
+	; \
+	make -j "$(nproc)" world; \
+	make install-world; \
+	make -C contrib install; \
+	\
+	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+# Remove plperl, plpython and pltcl dependencies by default to save image size
+# To use the pl extensions, those have to be installed in a derived image
+			| grep -v -e perl -e python -e tcl \
+	)"; \
+	apk add --no-cache --virtual .postgresql-rundeps \
+		$runDeps \
+		bash \
+		su-exec \
+		tzdata \
+		zstd \
+# https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.16.0#ICU_data_split
+		icu-data-full \
+# nss_wrapper is not availble on ppc64le: "test case segfaults in ppc64le"
+# https://git.alpinelinux.org/aports/commit/testing/nss_wrapper/APKBUILD?h=3.17-stable&id=94d81ceeb58cff448d489bbcbe9a6d40c9991663
+		$([ "$(apk --print-arch)" != 'ppc64le' ] && echo 'nss_wrapper') \
+	; \
+	apk del --no-network .build-deps; \
+	cd /; \
+	rm -rf \
+		/usr/src/postgresql \
+		/usr/local/share/doc \
+		/usr/local/share/man \
+	; \
+	\
+	postgres --version
 
 # make the sample config easier to munge (and "correct by default")
 RUN set -eux; \
-	dpkg-divert --add --rename --divert "/usr/share/postgresql/postgresql.conf.sample.dpkg" "/usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample"; \
-	cp -v /usr/share/postgresql/postgresql.conf.sample.dpkg /usr/share/postgresql/postgresql.conf.sample; \
-	ln -sv ../postgresql.conf.sample "/usr/share/postgresql/$PG_MAJOR/"; \
-	sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /usr/share/postgresql/postgresql.conf.sample; \
-	grep -F "listen_addresses = '*'" /usr/share/postgresql/postgresql.conf.sample
+	cp -v /usr/local/share/postgresql/postgresql.conf.sample /usr/local/share/postgresql/postgresql.conf.sample.orig; \
+	sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /usr/local/share/postgresql/postgresql.conf.sample; \
+	grep -F "listen_addresses = '*'" /usr/local/share/postgresql/postgresql.conf.sample
 
-RUN mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql && chmod 2777 /var/run/postgresql
+RUN mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql && chmod 3777 /var/run/postgresql
 
-ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
 ENV PGDATA /var/lib/postgresql/data
-# this 777 will be replaced by 700 at runtime (allows semi-arbitrary "--user" values)
-RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 777 "$PGDATA"
+# this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
+RUN mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGDATA" && chmod 1777 "$PGDATA"
 VOLUME /var/lib/postgresql/data
 
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN ln -s usr/local/bin/docker-entrypoint.sh / # backwards compat
+COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
+RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+# We set the default STOPSIGNAL to SIGINT, which corresponds to what PostgreSQL
+# calls "Fast Shutdown mode" wherein new connections are disallowed and any
+# in-progress transactions are aborted, allowing PostgreSQL to stop cleanly and
+# flush tables to disk, which is the best compromise available to avoid data
+# corruption.
+#
+# Users who know their applications do not keep open long-lived idle connections
+# may way to use a value of SIGTERM instead, which corresponds to "Smart
+# Shutdown mode" in which any existing sessions are allowed to finish and the
+# server stops when all sessions are terminated.
+#
+# See https://www.postgresql.org/docs/12/server-shutdown.html for more details
+# about available PostgreSQL server shutdown signals.
+#
+# See also https://www.postgresql.org/docs/12/server-start.html for further
+# justification of this as the default value, namely that the example (and
+# shipped) systemd service files use the "Fast Shutdown mode" for service
+# termination.
+#
+STOPSIGNAL SIGINT
+#
+# An additional setting that is recommended for all users regardless of this
+# value is the runtime "--stop-timeout" (or your orchestrator/runtime's
+# equivalent) for controlling how long to wait between sending the defined
+# STOPSIGNAL and sending SIGKILL (which is likely to cause data corruption).
+#
+# The default in most runtimes (such as Docker) is 10 seconds, and the
+# documentation at https://www.postgresql.org/docs/12/server-start.html notes
+# that even 90 seconds may not be long enough in many instances.
 
 EXPOSE 5432
 CMD ["postgres"]
